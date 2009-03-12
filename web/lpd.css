@@ -1,0 +1,40 @@
+A:active {
+  color: #ff6600;
+}
+
+A:visited {
+  color: #999999;
+}
+
+
+/***
+   * Menu
+   */
+
+a.menu {
+  font-family: helvetica,arial,sans-serif;
+  font-size: 30px;
+  text-decoration: none;
+}
+
+a.menu:hover {
+  background-color: rgb(225,225,225);
+}
+
+td.menu {
+  vertical-align: top;
+  width: 18%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* General */
+
+body {
+  color: black;
+  background-color: rgb(191, 191, 191);
+}
+
+A:link {
+  color: #ff6600;
+}
