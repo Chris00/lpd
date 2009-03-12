@@ -1,0 +1,32 @@
+
+                      INSTALLATION INSTRUCTIONS
+----------------------------------------------------------------------
+
+Build the library:
+
+	$ make
+
+(For win32 users, a BAT file does it for you.  You have to perform the
+following steps by hand however.)
+
+To build the example programs (you may want to look at the beginning
+of the ml files to configure them):
+
+	$ make ex
+
+
+Install it (requires findlib):
+
+	$ make install
+
+Remove the installed library (requires findlib):
+
+	$ make uninstall
+
+Clean up the build and examples directory:
+
+	$ make clean
+
+
+"findlib" is available at
+http://www.ocaml-programming.de/programming/download-caml.html

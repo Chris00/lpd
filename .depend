@@ -1,0 +1,9 @@
+lpd.cmi: socket.cmi 
+lpd.cmo: socket.cmi lpd.cmi 
+lpd.cmx: socket.cmx lpd.cmi 
+lpd_to_win.cmo: socket.cmi lpd.cmi 
+lpd_to_win.cmx: socket.cmx lpd.cmx 
+page_counter.cmo: socket.cmi lpd.cmi 
+page_counter.cmx: socket.cmx lpd.cmx 
+socket.cmo: socket.cmi 
+socket.cmx: socket.cmi 
