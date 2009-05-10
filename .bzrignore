@@ -1,7 +1,4 @@
-*.cmi
-*.cmo
-*.cma
-*.cmx
+*.cm[ioax]
 *.cmxa
 *.annot
 *.exe
