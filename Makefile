@@ -1,7 +1,7 @@
 #	$Id: Makefile,v 1.7 2007/02/15 23:38:51 chris_77 Exp $	
 
-PKGNAME	   = $(shell grep "name" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
-PKGVERSION = $(shell grep "version" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
+PKGNAME	= $(shell grep "name" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
+VERSION = $(shell grep "version" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
 
 OCAMLCFLAGS	= -dtypes
 OCAMLOPTFLAGS	= -dtypes -inline 3
@@ -13,7 +13,7 @@ DISTFILES	= INSTALL LICENSE META Make.bat Makefile hosts.lpd \
 MLI_FILES	= $(wildcard *.mli)
 DOCFILES	= lpd.mli socket.mli
 
-TARBALL 	= $(PKGNAME)-$(PKGVERSION).tar.gz
+TARBALL 	= $(PKGNAME)-$(VERSION).tar.gz
 ARCHIVE 	= $(shell grep "archive(byte)" META | \
 			sed -e "s/.*\"\([^\"]*\)\".*/\1/")
 XARCHIVE 	= $(shell grep "archive(native)" META | \
