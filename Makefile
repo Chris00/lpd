@@ -3,16 +3,6 @@
 PKGNAME	   = $(shell grep "name" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
 PKGVERSION = $(shell grep "version" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
 
-SRC_WEB    = web
-SF_WEB     = /home/groups/o/oc/ocaml-lpd/htdocs
-
-CAMLPATH	= 
-OCAMLC		= $(CAMLPATH)ocamlc
-OCAMLP4		= $(CAMLPATH)camlp4o
-OCAMLOPT	= $(CAMLPATH)ocamlopt
-OCAMLDEP	= $(CAMLPATH)ocamldep
-OCAMLDOC	= $(CAMLPATH)ocamldoc
-
 OCAMLCFLAGS	= -dtypes
 OCAMLOPTFLAGS	= -dtypes -inline 3
 OCAMLDOCFLAGS	= -html -stars -colorize-code #-css-style $(OCAMLDOCCSS)
@@ -23,7 +13,7 @@ DISTFILES	= INSTALL LICENSE META Make.bat Makefile hosts.lpd \
 MLI_FILES	= $(wildcard *.mli)
 DOCFILES	= lpd.mli socket.mli
 
-PKG_TARBALL 	= $(PKGNAME)-$(PKGVERSION).tar.gz
+TARBALL 	= $(PKGNAME)-$(PKGVERSION).tar.gz
 ARCHIVE 	= $(shell grep "archive(byte)" META | \
 			sed -e "s/.*\"\([^\"]*\)\".*/\1/")
 XARCHIVE 	= $(shell grep "archive(native)" META | \
@@ -31,29 +21,20 @@ XARCHIVE 	= $(shell grep "archive(native)" META | \
 
 default: all
 
-######################################################################
-
-PKGS = $(shell grep "requires" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
-PKGS_CMA 	= $(addsuffix .cma, $(PKGS))
-PKGS_CMXA 	= $(addsuffix .cmxa, $(PKGS))
-
-CMI_FILES	= $(MLI_FILES:.mli=.cmi)
+OCAMLPACKS = $(shell grep "requires" META | sed -e "s/.*\"\([^\"]*\)\".*/\1/")
 
 .PHONY: all byte opt install install-byte install-opt doc dist
 all: byte opt
 byte: socket.cma lpd.cma
 opt: socket.cmxa lpd.cmxa
 
-
 # Make the examples
 .PHONY: ex examples
 ex: lpd_to_win.exe page_counter.exe
 
-%.exe: socket.cma lpd.cma %.ml
-	$(OCAMLC) $(OCAMLCFLAGS) -o $@  -I +threads $(PKGS_CMA) threads.cma $^
-%.opt: socket.cmxa lpd.cmxa %.ml
-	$(OCAMLOPT) $(OCAMLOPTFLAGS) -o $@ -I +threads \
-	  $(PKGS_CMXA) threads.cmxa $^
+lpd_to_win.%: OCAMLC_FLAGS += -thread
+lpd_to_win.%: OCAMLPACKS := $(OCAMLPACKS),threads
+
 
 # (Un)installation
 .PHONY: install uninstall
@@ -81,55 +62,63 @@ doc: $(DOCFILES) $(CMI_FILES)
 	fi
 
 # Make a tarball
-.PHONY: dist
-dist:
-	mkdir $(PKGNAME)-$(PKGVERSION)
-	cp -r $(DISTFILES) $(PKGNAME)-$(PKGVERSION)/
-#	Create a trivial hosts.lpd
-#	echo "# hosts.lpd\nmachine.network.com" \
-#	  > $(PKGNAME)-$(PKGVERSION)/hosts.lpd
-	tar --exclude "CVS" --exclude ".cvsignore" --exclude "*~" \
-	  --exclude "*.cm{i,x,o,xa}" --exclude "*.o" \
-	  -zcvf $(PKG_TARBALL) $(PKGNAME)-$(PKGVERSION)
-	rm -rf $(PKGNAME)-$(PKGVERSION)
+.PHONY: tar
+tar: $(TARBALL)
+$(TARBALL):
+	bzr export $(TARBALL) -r "tag:$(VERSION)"
+	@echo "Created tarball '$(TARBALL)'."
 
-# Release a tarball and publish the HTML doc 
--include Makefile.pub
+######################################################################
 
+OCAMLFIND	= ocamlfind
+OCAMLC		= $(OCAMLFIND) ocamlc
+OCAMLP4		= $(OCAMLFIND) camlp4o
+OCAMLOPT	= $(OCAMLFIND) ocamlopt
+OCAMLDEP	= $(OCAMLFIND) ocamldep
+OCAMLDOC	= $(OCAMLFIND) ocamldoc
 
 # Generic compilation instructions.
 
+OCAML_PACKAGES=$(if $(OCAMLPACKS), -package $(OCAMLPACKS))
+
 %.cmi: %.mli
-	$(OCAMLC) $(OCAMLCFLAGS) -c $<
+	$(OCAMLC) $(PP_FLAGS) $(OCAMLC_FLAGS) $(OCAML_PACKAGES) -c $<
 
 %.cmo: %.ml
-	$(OCAMLC) $(OCAMLCFLAGS) -c $<
+	$(OCAMLC) $(PP_FLAGS) $(OCAMLC_FLAGS) $(OCAML_PACKAGES) -c $<
 
-%.cma: %.ml %.cmi
-	$(OCAMLC) -a -o $@ $(OCAMLCFLAGS) $<
+%.cma: %.cmo
+	$(OCAMLC) $(PP_FLAGS) -a -o $@ $(OCAMLC_FLAGS) $^
 
 %.cmx: %.ml
-	$(OCAMLOPT) $(OCAMLOPTFLAGS) -c $<
+	$(OCAMLOPT) $(PP_FLAGS) $(OCAMLOPT_FLAGS) $(OCAML_PACKAGES) -c $<
 
-%.cmxa: %.ml %.cmi
-	$(OCAMLOPT) -a -o $@ $(OCAMLOPTFLAGS) $<
+%.cmxa: %.cmx
+	$(OCAMLOPT) $(PP_FLAGS) -a -o $@ $(OCAMLOPT_FLAGS) $^
 
-.PHONY: dep depend
-dep:    .depend
-depend: .depend
+%.exe: %.cmo socket.cma lpd.cma
+	$(OCAMLC) -o $@ $(PP_FLAGS) $(OCAMLC_FLAGS) $(OCAML_PACKAGES) \
+	  $(LIBS_CMA) $(filter %.cmo %.cma,$(filter-out $<,$+)) \
+	  -linkpkg $<
 
-.depend: $(wildcard *.mli) $(wildcard *.ml) $(wildcard */*.ml)
-	ocamldep $^ > $@
+%.com: %.cmx socket.cmxa lpd.cmxa
+	$(OCAMLOPT) -o $@ $(PP_FLAGS) $(OCAMLOPT_FLAGS) $(OCAML_PACKAGES) \
+	  $(LIBS_CMXA) $(filter %.cmx %.cmxa,$(filter-out $<,$+)) \
+	  -linkpkg $<
 
-ifeq ($(wildcard .depend),.depend)
-include .depend
-endif
+
+.depend.ocaml: $(wildcard *.ml) $(wildcard *.mli)
+	@echo "Building $@ ... "
+	-@test -z "$^" || $(OCAMLDEP) $(PP_FLAGS) $(SYNTAX_OPTS) $^ > $@
+# If we do not force inclusion (e.g. with "-" prefix), then it is not
+# recreated and taken into account properly.
+include .depend.ocaml
 
 
 .PHONY:clean
 clean:
 	rm -f *~ .*~ *.{o,a} *.cm[aiox] *.cmxa *.annot
-	rm -rf $(DOC_DIR) $(PKG_TARBALL)
-	find . -type f -perm -u=x -exec rm -f {} \;
+	rm -rf $(DOC_DIR) $(TARBALL)
+	find . -type f -name "*.exe" -perm -u=x -exec rm -f {} \;
 
 .SUFFIXES: .ml .mli .cmi .cmo

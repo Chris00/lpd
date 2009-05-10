@@ -1,0 +1,5 @@
+#!/bin/sh
+
+SF=bzr+ssh://chris_77@ocaml-lpd.bzr.sourceforge.net/bzrroot/ocaml-lpd/trunk/
+
+bzr push $SF

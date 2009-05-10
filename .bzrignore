@@ -3,6 +3,7 @@
 *.annot
 *.exe
 *.opt
+.depend.ocaml
 rfc1179.html
 rfc1179.html.gz
 Makefile.pub

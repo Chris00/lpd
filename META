@@ -1,6 +1,6 @@
 # Specifications for the Lpd module                   -*-shell-script-*-
 name = "Lpd"
-version = "0.9"
+version = "1.0"
 description = "Line printer deamon."
 requires = "unix"
 archive(byte) = "socket.cma lpd.cma"

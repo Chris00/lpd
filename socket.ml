@@ -207,7 +207,8 @@ let input_all_till c ic =
 (* Define an [open_connection] alike the one in the Unix lib for
    convenience. *)
 let open_connection sockaddr =
-  let sock = Unix.socket (domain_of_sockaddr sockaddr) Unix.SOCK_STREAM 0 in
+  let sock =
+    Unix.socket (Unix.domain_of_sockaddr sockaddr) Unix.SOCK_STREAM 0 in
   try
     Unix.connect sock sockaddr;
     (in_channel_of_descr sock, out_channel_of_descr sock)
