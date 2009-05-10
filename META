@@ -1,5 +1,5 @@
 # Specifications for the Lpd module                   -*-shell-script-*-
-name = "Lpd"
+name = "lpd"
 version = "1.0"
 description = "Line printer deamon."
 requires = "unix"
