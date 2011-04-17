@@ -49,3 +49,8 @@ Executable page_counter
   CompiledObject: best
   BuildTools:     ocamlbuild
   Install:        false
+
+SourceRepository trunk
+  Type:       svn
+  Location:   svn://svn.forge.ocamlcore.org/svn/lpd/trunk
+  Browser:    https://forge.ocamlcore.org/scm/browser.php?group_id=102
