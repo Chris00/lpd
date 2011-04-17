@@ -1,0 +1,51 @@
+#                                                               -*-conf-*-
+OASISFormat: 0.2
+Name:        lpd
+Version:     1.0
+Synopsis:    A Line Printer Daemon (LPD) server library written entirely in OCaml.
+Description: Lpd is a Line Printer Daemon compliant with RFC 1179
+  written entirely in OCaml. It allows to define your own actions for
+  LPD events.  An example of a spooler that prints jobs on win32
+  machines (through GSPRINT) is provided.
+Authors:     Christophe Troestler
+License:     LGPL-3.0 with OCaml linking exception
+Plugins:     META (0.2), StdFiles (0.2)
+
+Library lpd
+  Path:       .
+  BuildTools: ocamlbuild
+  Modules:    Lpd
+  BuildDepends: lpd.socket
+
+Library socket
+  Path:       .
+  BuildTools: ocamlbuild
+  Modules:    Socket
+  BuildDepends: unix
+  FindlibParent: lpd
+  XMETADescription: Buffered sockets (working even on win98).
+
+Document API
+  Title:           API reference for Lpd
+  Type:            OCamlbuild (0.2)
+  InstallDir:      $docdir/api
+  BuildTools:      ocamldoc, ocamlbuild
+  XOCamlbuildPath: .
+  XOCamlbuildLibraries: lpd, lpd.socket
+
+# Example programs using the library.
+Executable lpd_to_win
+  Path:           .
+  MainIs:         lpd_to_win.ml
+  BuildDepends:   lpd, threads
+  CompiledObject: best
+  BuildTools:     ocamlbuild
+  Install:        false
+
+Executable page_counter
+  Path:           .
+  MainIs:         page_counter.ml
+  BuildDepends:   lpd
+  CompiledObject: best
+  BuildTools:     ocamlbuild
+  Install:        false

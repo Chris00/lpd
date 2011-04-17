@@ -5,13 +5,13 @@
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public License
-   version 2.1 as published by the Free Software Foundation, with the
-   special exception on linking described in file LICENSE.
+   version 3 or later as published by the Free Software Foundation, with
+   the special exception on linking described in file LICENSE.txt.
 
    This library is distributed in the hope that it will be useful, but
    WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the file
-   LICENSE for more details.
+   LICENSE.txt for more details.
 *)
 (*      $Id: lpd.mli,v 1.5 2007/02/15 23:38:51 chris_77 Exp $      *)
 

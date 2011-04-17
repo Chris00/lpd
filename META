@@ -1,8 +1,0 @@
-# Specifications for the Lpd module                   -*-shell-script-*-
-name = "lpd"
-version = "1.0"
-description = "Line printer deamon."
-requires = "unix"
-archive(byte) = "socket.cma lpd.cma"
-archive(native) = "socket.cmxa lpd.cmxa"
-# Program(byte) = "lpd.exe"

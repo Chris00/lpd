@@ -1,10 +1,10 @@
 (* Library LDP prorocol (RFC1179).
 
-   © 2004 Christophe Troestler
+   © 2004-present Christophe Troestler
 
    This program is distributed under the terms of the GNU Lesser
    General Public License, with the special exception on linking as
-   for the OCaml Library.  See file LICENSE.
+   for the OCaml Library.  See file LICENSE.txt
 *)
 
 
