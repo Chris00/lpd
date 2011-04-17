@@ -11,6 +11,10 @@ Authors:     Christophe Troestler
 License:     LGPL-3.0 with OCaml linking exception
 Plugins:     META (0.2), StdFiles (0.2)
 
+Flag example
+  Description: Build the examples.
+  Default:     true
+
 Library lpd
   Path:       .
   BuildTools: ocamlbuild
@@ -35,6 +39,7 @@ Document API
 
 # Example programs using the library.
 Executable lpd_to_win
+  Build$: flag(example)
   Path:           .
   MainIs:         lpd_to_win.ml
   BuildDepends:   lpd, threads
@@ -43,6 +48,7 @@ Executable lpd_to_win
   Install:        false
 
 Executable page_counter
+  Build$: flag(example)
   Path:           .
   MainIs:         page_counter.ml
   BuildDepends:   lpd
