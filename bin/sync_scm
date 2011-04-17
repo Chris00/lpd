@@ -1,6 +1,6 @@
 #!/bin/sh
 
-bzr.dev push  svn+ssh://svn.forge.ocamlcore.org/svnroot/lpd/trunk
+bzr push  svn+ssh://svn.forge.ocamlcore.org/svnroot/lpd/trunk
 
 SF=bzr+ssh://chris_77@ocaml-lpd.bzr.sourceforge.net/bzrroot/ocaml-lpd/trunk/
 
