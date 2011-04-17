@@ -10,6 +10,7 @@ rfc1179.html
 rfc1179.html.gz
 Makefile.pub
 doc
+web/LICENSE.txt
 # OASIS generated files:
 API.odocl
 AUTHORS.txt
@@ -23,3 +24,4 @@ myocamlbuild.ml
 setup.data
 setup.log
 setup.ml
+*.tar.gz
