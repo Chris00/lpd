@@ -42,6 +42,6 @@ clean::
 	ocaml setup.ml -clean
 	$(RM) $(PKG_TARBALL)
 
-distclean:
+distclean: clean
 	ocaml setup.ml -distclean
-	$(RM) $(wildcard *.ba[0-9] *.bak *~ *.odocl) setup.log
+	$(RM) $(wildcard *.ba[0-9] *.bak *~ *.odocl)
