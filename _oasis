@@ -56,7 +56,7 @@ Executable page_counter
   BuildTools:     ocamlbuild
   Install:        false
 
-SourceRepository trunk
-  Type:       svn
-  Location:   svn://svn.forge.ocamlcore.org/svn/lpd/trunk
-  Browser:    https://forge.ocamlcore.org/scm/browser.php?group_id=102
+SourceRepository master
+  Type:       git
+  Location:   https://forge.ocamlcore.org/anonscm/git/lpd/lpd.git
+  Browser:    http://forge.ocamlcore.org/scm/browser.php?group_id=102
