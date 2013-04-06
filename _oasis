@@ -8,7 +8,9 @@ Description: Lpd is a Line Printer Daemon compliant with RFC 1179
   LPD events.  An example of a spooler that prints jobs on win32
   machines (through GSPRINT) is provided.
 Authors:     Christophe Troestler
+Maintainers: Christophe Troestler <Christophe.Troestler@umons.ac.be>
 License:     LGPL-3.0 with OCaml linking exception
+Homepage:    http://lpd.forge.ocamlcore.org/
 Plugins:     META (0.3), StdFiles (0.3)
 
 Flag example
