@@ -1,5 +1,5 @@
 #                                                               -*-conf-*-
-OASISFormat: 0.2
+OASISFormat: 0.3
 Name:        lpd
 Version:     1.1
 Synopsis:    A Line Printer Daemon (LPD) server library written entirely in OCaml.
@@ -9,7 +9,7 @@ Description: Lpd is a Line Printer Daemon compliant with RFC 1179
   machines (through GSPRINT) is provided.
 Authors:     Christophe Troestler
 License:     LGPL-3.0 with OCaml linking exception
-Plugins:     META (0.2), StdFiles (0.2)
+Plugins:     META (0.3), StdFiles (0.3)
 
 Flag example
   Description: Build the examples.
@@ -31,7 +31,7 @@ Library socket
 
 Document API
   Title:           API reference for Lpd
-  Type:            OCamlbuild (0.2)
+  Type:            OCamlbuild (0.3)
   InstallDir:      $docdir/api
   BuildTools:      ocamldoc, ocamlbuild
   XOCamlbuildPath: .
