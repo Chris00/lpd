@@ -4,7 +4,7 @@ PKG_TARBALL = $(PKGNAME)-$(PKGVERSION).tar.gz
 
 WEB = lpd.forge.ocamlcore.org:/home/groups/lpd/htdocs
 
-DISTFILES = LICENSE.txt AUTHORS.txt INSTALL.txt README.txt _oasis \
+DISTFILES = LICENSE.txt AUTHORS.txt INSTALL.txt README.md _oasis \
   _tags META Makefile lpd.mllib socket.mllib myocamlbuild.ml \
   setup.ml API.odocl $(wildcard *.ml) $(wildcard *.mli)
 
