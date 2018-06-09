@@ -129,15 +129,18 @@ sig
         no way to know for how long you need them).  None of the queue
         names can contain a space (i.e. ' ', '\t', '\012' or
         '\013'). *)
+
   val authorized_host : Unix.sockaddr -> bool
     (** [authorized_host addr] determines whether a connection from
         [addr] is accepted. *)
+
   val log : string -> unit
     (** How to log connections and protocol.  It is the responsability
         of this function to add a final ["\n"] and to flush the
         necessary channel.  [print_endline] is an easy choice.  It is
         customary to add a timestamp to the messages being logged.
         {!Lpd.string_of_current_time} can help you with that.  *)
+
   val temp_dir : string
     (** Temprary directory to store the jobs sent.  If equal to [""],
         the value of the environment variable [TMPDIR] (or [TEMP] on
@@ -196,6 +199,7 @@ val header_of_job : string -> string
   (** [header_of_job queue] returns a string suitable as a header for
       {!Lpd.string_of_job}.  If [queue = ""], the mention of the queue
       is omitted. *)
+
 val string_of_job : int -> job -> string
   (** [string_of_job rank job] returns a one line string describing
       the [job].  A job with an empty list of files is considered to
@@ -204,6 +208,7 @@ val string_of_job : int -> job -> string
       job is in the printing stage.  [string_of_job] is a helper
       function to design a [send_queue] callback (see
       {!Lpd.queue_actions}). *)
+
 val long_string_of_job : int -> job -> string
   (** [long_string_of_job rank job] does the same as
       {!Lpd.string_of_job} except that the description is in long
@@ -213,6 +218,7 @@ val long_string_of_job : int -> job -> string
 val any_host : Unix.sockaddr -> bool
   (** [any_host addr] accepts any Internet host which can be found in
       the DNS. *)
+
 val these_hosts : ?file:string -> string list -> (Unix.sockaddr -> bool)
   (** [these_hosts ?file hosts adrr] accepts connections from Internet
       hosts or IP addresses listed in the file or in the list [hosts].

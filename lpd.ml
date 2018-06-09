@@ -10,8 +10,8 @@
 
 open Printf
 
-let debug msg = prerr_endline ("[DEBUG] " ^ msg)
-let debug msg = ()
+(* let debug msg = prerr_endline ("[DEBUG] " ^ msg) *)
+let debug _msg = ()
 
 
 (* Useful functions
@@ -56,7 +56,7 @@ let contains_only is_valid s =
    @raise [End_of_file] if the end of file is reached before [len]
    characters have been read. *)
 let rec really_input_tochan inchan oc len =
-  let buffer = String.create 4096 in
+  let buffer = Bytes.create 4096 in
   if len > 0 then begin
     let r = Socket.input inchan buffer 0 (min 4096 len) in
     if r = 0 then raise End_of_file
@@ -74,7 +74,7 @@ let rec really_input_tochan inchan oc len =
    more characters can be read).  All previously read characters are
    sent to [oc]. *)
 let rec input_tochan_till sk oc c =
-  let buffer = String.create 4096 in
+  let buffer = Bytes.create 4096 in
   let r = Socket.input_till '\000' sk buffer 0 4096 in
   if r > 0 then begin
     output oc buffer 0 r;
@@ -484,7 +484,7 @@ struct
   (* [receive_job] gets the data and control files (till EOF is
      reached), process the control files and then call the handler [f]
      on the resulting job.  *)
-  let rec receive_job client_addr inchan outchan f =
+  let receive_job client_addr inchan outchan f =
     let ctrl_files = ref [] (* list (cfname, ctrl file as string) *)
     and files = ref M.empty (* dfname -> storage_file *) in
     begin
@@ -726,7 +726,7 @@ let string_of_current_time () =
 let any_host client =
   match client with
   | Unix.ADDR_UNIX _ -> false
-  | Unix.ADDR_INET (addr, port) ->
+  | Unix.ADDR_INET (addr, _port) ->
       try
         let _ = (Unix.gethostbyaddr addr).Unix.h_name in
         (* 721 <= port && port <= 731 *)
@@ -757,7 +757,7 @@ let these_hosts ?file hosts =
   fun client ->
     match client with
     | Unix.ADDR_UNIX _ -> false
-    | Unix.ADDR_INET (addr, port) ->
+    | Unix.ADDR_INET (addr, _port) ->
         try
           let client_addr = Unix.string_of_inet_addr addr  in
           (* If the IP is listed, we do not need to try to resolve it. *)

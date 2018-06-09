@@ -16,19 +16,19 @@ let buffer_len = 4096
 
 type out_channel = {
   out_fd : Unix.file_descr;
-  out_buf : string;  (* The data to output is in out_buf.[i], 0 <= i < out1 *)
+  out_buf : Bytes.t;  (* The data to output is in out_buf.[i], 0 <= i < out1 *)
   mutable out1 : int;(* out1 <= buffer_len ; < 0 iff channel closed. *)
 }
 
 let out_channel_of_descr fd = {
   out_fd = fd;
-  out_buf = String.create buffer_len;  out1 = 0; }
+  out_buf = Bytes.create buffer_len;  out1 = 0; }
 
 let descr_of_out_channel outchan = outchan.out_fd
 
 type in_channel = {
   in_fd : Unix.file_descr;
-  in_buf : string;   (* The data in the in_buf is at indexes i s.t. *)
+  in_buf : Bytes.t;   (* The data in the in_buf is at indexes i s.t. *)
   mutable in0 : int; (* in0 <= i < in1. *)
   mutable in1 : int; (* Invariant: 0 <= in0 ; in1 <= buffer_len
                         in1 < 0 indicates a closed channel. *)
@@ -36,7 +36,7 @@ type in_channel = {
 
 let in_channel_of_descr fd = {
   in_fd = fd;
-  in_buf = String.create buffer_len; in0 = 0; in1 = 0 }
+  in_buf = Bytes.create buffer_len; in0 = 0; in1 = 0 }
 
 let descr_of_in_channel inchan = inchan.in_fd
 
@@ -66,7 +66,7 @@ let close_out oc =
 
 let rec unsafe_output oc buf pos len =
   let w = min len (buffer_len - oc.out1) in
-  String.blit buf pos oc.out_buf oc.out1 w;
+  Bytes.blit buf pos oc.out_buf oc.out1 w;
   oc.out1 <- oc.out1 + w;
   if w < len then begin
     flush_noerr oc;
@@ -74,19 +74,19 @@ let rec unsafe_output oc buf pos len =
   end
 
 let output oc buf pos len =
-  if pos < 0 || len < 0 || pos + len > String.length buf
+  if pos < 0 || len < 0 || pos + len > Bytes.length buf
   then invalid_arg "Socket.output";
   if oc.out1 < 0 then raise(Sys_error "Bad file descriptor");
   unsafe_output oc buf pos len
 
 let output_string oc s =
   if oc.out1 < 0 then raise(Sys_error "Bad file descriptor");
-  unsafe_output oc s 0 (String.length s)
+  unsafe_output oc (Bytes.unsafe_of_string s) 0 (String.length s)
 
 let output_char oc c =
   if oc.out1 < 0 then raise(Sys_error "Bad file descriptor");
   if oc.out1 = buffer_len then flush_noerr oc;
-  String.unsafe_set oc.out_buf oc.out1 c;
+  Bytes.unsafe_set oc.out_buf oc.out1 c;
   oc.out1 <- oc.out1 + 1
 
 let fprintf oc =
@@ -121,12 +121,12 @@ let fill_in_buf chan =
 let unsafe_input chan buf ofs len =
   fill_in_buf chan;
   let r = min len (chan.in1 - chan.in0) in
-  String.blit chan.in_buf chan.in0 buf ofs r;
+  Bytes.blit chan.in_buf chan.in0 buf ofs r;
   chan.in0 <- chan.in0 + r;
   r
 
 let input ic buf ofs len =
-  if ofs < 0 || len < 0 || ofs + len > String.length buf
+  if ofs < 0 || len < 0 || ofs + len > Bytes.length buf
   then invalid_arg "Socket.input";
   if ic.in1 < 0 then raise(Sys_error "Bad file descriptor");
   unsafe_input ic buf ofs len
@@ -136,7 +136,7 @@ let input_char ic =
   fill_in_buf ic;
   if ic.in1 = 0 then raise End_of_file
   else
-    let c = String.unsafe_get ic.in_buf ic.in0 in
+    let c = Bytes.unsafe_get ic.in_buf ic.in0 in
     ic.in0 <- ic.in0 + 1;
     c
 
@@ -149,7 +149,7 @@ let rec unsafe_really_input ic s ofs len =
   end
 
 let really_input ic s ofs len =
-  if ofs < 0 || len < 0 || ofs + len > String.length s
+  if ofs < 0 || len < 0 || ofs + len > Bytes.length s
   then invalid_arg "Socket.really_input";
   if ic.in1 < 0 then raise(Sys_error "Bad file descriptor");
   unsafe_really_input ic s ofs len
@@ -163,14 +163,14 @@ let really_input ic s ofs len =
 let index_in_range i0 i1 c s =
   let rec examine i =
     if i < i1 then
-      if String.unsafe_get s i = c then i
+      if Bytes.unsafe_get s i = c then i
       else examine (i+1)
     else i1 in
   examine i0
 
 
 let input_till c ic buf ofs len =
-  if ofs < 0 || len < 0 || ofs + len > String.length buf
+  if ofs < 0 || len < 0 || ofs + len > Bytes.length buf
   then invalid_arg "Socket.input_till";
   if ic.in1 < 0 then raise(Sys_error "Bad file descriptor");
   fill_in_buf ic;
@@ -178,18 +178,19 @@ let input_till c ic buf ofs len =
   let in1 = min (ic.in0 + len) ic.in1 in
   let i = index_in_range ic.in0 in1 c ic.in_buf in
   let r = i - ic.in0 in
-  String.blit ic.in_buf ic.in0 buf ofs r;
+  Bytes.blit ic.in_buf ic.in0 buf ofs r;
   ic.in0 <- i;
   r
 
 let rec input_till_char acc c ic =
   fill_in_buf ic;
   if ic.in1 = 0 then
-    if acc = "" then raise End_of_file else acc
+    if acc = Bytes.empty then raise End_of_file else acc
   else begin
     (* Buffer contains something (ic.in0 < ic.in1), seek [c]. *)
     let i = index_in_range ic.in0 ic.in1 c ic.in_buf in
-    let line = acc ^ (String.sub ic.in_buf ic.in0 (i - ic.in0)) in
+    (* FIXME: use a buffer: *)
+    let line = Bytes.cat acc (Bytes.sub ic.in_buf ic.in0 (i - ic.in0)) in
     ic.in0 <- i + 1; (* skip [c] *)
     if i = ic.in1 then input_till_char line c ic
     else line
@@ -197,11 +198,11 @@ let rec input_till_char acc c ic =
 
 let input_line ic =
   if ic.in1 < 0 then raise(Sys_error "Bad file descriptor");
-  input_till_char "" '\n' ic
+  Bytes.unsafe_to_string(input_till_char Bytes.empty '\n' ic)
 
 let input_all_till c ic =
   if ic.in1 < 0 then raise(Sys_error "Bad file descriptor");
-  input_till_char "" c ic
+  Bytes.unsafe_to_string(input_till_char Bytes.empty c ic)
 
 
 (* Define an [open_connection] alike the one in the Unix lib for

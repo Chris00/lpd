@@ -13,5 +13,6 @@ build: [
 ]
 depends: [
   "jbuilder" {build}
+  "base-bytes"
   "base-unix"
 ]

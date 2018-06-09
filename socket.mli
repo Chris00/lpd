@@ -50,7 +50,7 @@ val shutdown_connection : in_channel -> unit
 
 (** {2 Output functions} *)
 
-val output : out_channel -> string -> int -> int -> unit
+val output : out_channel -> Bytes.t -> int -> int -> unit
   (** [output oc buf pos len] writes [len] characters from string
     [buf], starting at offset [pos], to the given buffered socket [oc].
 
@@ -83,7 +83,7 @@ val close_out : out_channel -> unit
 
 (** {2 Input functions} *)
 
-val input : in_channel -> string -> int -> int -> int
+val input : in_channel -> Bytes.t -> int -> int -> int
   (** [input ic buf pos len] reads up to [len] characters from the
     given socket [ic], storing them in string [buf], starting at
     character number [pos].  It returns the actual number of
@@ -102,7 +102,7 @@ val input_char : in_channel -> char
     @raise Sys_blocked_io if we are in non-blocking mode and [input_char]
     would block (no characters are then read).  *)
 
-val really_input : in_channel -> string -> int -> int -> unit
+val really_input : in_channel -> Bytes.t -> int -> int -> unit
   (** [really_input ic buf pos len] reads [len] characters from the
     buffered socket [ic], storing them in string [buf], starting at
     character number [pos].
@@ -123,7 +123,7 @@ val input_line : in_channel -> string
     [input_line] would block (the characters that may have been read
     are lost). *)
 
-val input_till : char -> in_channel -> string -> int -> int -> int
+val input_till : char -> in_channel -> Bytes.t -> int -> int -> int
   (** [input_till c ic buf pos len] reads up to [len] characters
     different from [c] from the socket [ic], storing them in string
     [buf], starting at character number [pos].  The return value is
@@ -183,7 +183,7 @@ val select : in_channel list -> out_channel list -> float
 
 class out_channel_obj : out_channel ->
 object
-  method output : string -> int -> int -> int
+  method output : Bytes.t -> int -> int -> int
     (** [#output buf pos len] writes up to [len] characters from
       string [buf], starting at offset [pos], to the given object
       output stream and returns the number of characters actually
@@ -215,7 +215,7 @@ end
 
 class in_channel_obj : in_channel ->
 object
-  method input : string -> int -> int -> int
+  method input : Bytes.t -> int -> int -> int
     (** [#input buf pos len] reads up to [len] characters from the
         object, storing them in string [buf], starting at character
         number [pos].  It returns the actual number of characters read,
@@ -234,10 +234,10 @@ object
     method input_line : unit -> string
       (** See {!Socket.input_line}. *)
 
-    method really_input : string -> int -> int -> unit
+    method really_input : Bytes.t -> int -> int -> unit
       (** See {!Socket.really_input}. *)
 
-    method input_till : char -> string -> int -> int -> int
+    method input_till : char -> Bytes.t -> int -> int -> int
       (** See {!Socket.input_till}. *)
 
     method input_all_till : char -> string

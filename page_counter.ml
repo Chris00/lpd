@@ -117,22 +117,22 @@ let sanitize host =
   if !slen = len then host
   else if !slen = 0 then "not_valid"
   else
-    let s = String.create !slen in
+    let s = Bytes.create !slen in
     let j = ref 0 in
     for i = 0 to len - 1 do
       let c = String.unsafe_get host i in
-      if is_safe(c) then (String.unsafe_set s !j c; incr j)
+      if is_safe(c) then (Bytes.unsafe_set s !j c; incr j)
     done;
-    s
+    Bytes.unsafe_to_string s
 
 (* [copy oldfile newfile] moves the [oldfile] to [newfile].  It works
    accross filesystems.  It does not erase [oldfile]. *)
 let copy oldfile newfile =
-  let buf = String.create 4096 in
+  let buf = Bytes.create 4096 in
   let fd0 = Unix.openfile oldfile [Unix.O_RDONLY] 0o600 in
   let flags = [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_EXCL] in
   let fd1 = (try Unix.openfile newfile flags 0o600
-	     with e -> Unix.close fd0; raise e) in
+             with e -> Unix.close fd0; raise e) in
   let rec copy_chunk () =
     let len = Unix.read fd0 buf 0 4096 in
     if len > 0 then (
@@ -235,7 +235,7 @@ let print queue spool job =
       raise e
   )
 
-let send_queue queue ~long jobs outchan =
+let send_queue queue ~long _jobs outchan =
   let cmd = (if long then "lpq -l -P" else "lpq -P") ^ queue in
   let fh = Unix.open_process_in cmd in
   (try
@@ -277,7 +277,7 @@ let user_of_cf spool =
    here.  The security however is minimal -- given what is stored in
    control file, we cannot even verify that the removal order comes
    from the same machine which sent the job.  *)
-let remove queue spool agent addr jobs =
+let remove queue spool agent _addr jobs =
   if List.mem (Lpd.User agent) jobs then
     ignore(Unix.system (sprintf "/usr/bin/lprm -P%s %s" queue agent))
   else if jobs = [] then

@@ -27,7 +27,7 @@ let authorized_host_file = "hosts.lpd"
 
 (* The spool directory.  It will be created on startup if it does not
    exists. *)
-let spool_dir = "c:\\spool"
+(* let spool_dir = "c:\\spool" *)
 let spool_dir = "/tmp/spool"
 
 (* Full path of the GSPRINT program (in the GSView package).  Beware
@@ -105,9 +105,9 @@ let gs win_queue file =
      assert(false)
    with End_of_file -> ());
   log_cont(sprintf "%i pages printed of %S"
-	     (file.Lpd.nbcopies * !npages) file.Lpd.name);
+             (file.Lpd.nbcopies * !npages) file.Lpd.name);
   match Unix.close_process_in fh with
-  | Unix.WEXITED r -> ()
+  | Unix.WEXITED _ -> ()
   | _ -> ()
 
 
