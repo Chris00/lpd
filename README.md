@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/Chris00/lpd.svg?branch=master)](https://travis-ci.org/Chris00/lpd)
+[![Build status](https://ci.appveyor.com/api/projects/status/3a921xwdqq68d048?svg=true)](https://ci.appveyor.com/project/Chris00/lpd)
+
 LPD
 ===
 
