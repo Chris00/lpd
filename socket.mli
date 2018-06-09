@@ -217,16 +217,16 @@ class in_channel_obj : in_channel ->
 object
   method input : string -> int -> int -> int
     (** [#input buf pos len] reads up to [len] characters from the
-	object, storing them in string [buf], starting at character
-	number [pos].  It returns the actual number of characters read,
-	between 0 and [len] (inclusive).  A return value [0] (when
-	[len > 0]) means that the write would block (and we are in
-	non-blocking mode).
+        object, storing them in string [buf], starting at character
+        number [pos].  It returns the actual number of characters read,
+        between 0 and [len] (inclusive).  A return value [0] (when
+        [len > 0]) means that the write would block (and we are in
+        non-blocking mode).
 
-	@raise End_of_file when the end of the stream is reached, and
-	there are no more octets that could be read.
-	@raise Invalid_argument "Socket.input" if [pos] and [len] do
-	not designate a valid substring of [buf].  *)
+        @raise End_of_file when the end of the stream is reached, and
+        there are no more octets that could be read.
+        @raise Invalid_argument "Socket.input" if [pos] and [len] do
+        not designate a valid substring of [buf].  *)
 
     method input_char : unit -> char
       (** See {!Socket.input_char}. *)
@@ -245,6 +245,6 @@ object
 
     method close_in : unit -> unit
       (** Close the given channel (and underlying socket).  See
-	  {!Socket.close_in}. *)
+          {!Socket.close_in}. *)
   end
 

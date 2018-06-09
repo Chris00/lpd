@@ -27,20 +27,20 @@
 type banner = {
   user_name : string; (** User name for the banner page. *)
   class_name : string; (** Class name, conventionally used to display the
-			   host from which the printing job originated. *)
+                           host from which the printing job originated. *)
   job_name : string; (** Job name, conventionally used to display the
-			 name of the file or files which were "printed".  *)
+                         name of the file or files which were "printed".  *)
 }
 
 (** Information on the type of the file to be printed. *)
 type file_type =
   | Text of int * int
       (** [Text(indent, number_of_columns)]: print as a text file,
-	  providing page breaks as necessary.  According to the RFC,
-	  any ASCII control chars other than '\b', '\t', '\n', '\012',
-	  '\r' should be discarded -- it is your task to do so as you
-	  know better how to deal with them (accented letters,...)
-	  especially when you know PDF files may be sent using that type!  *)
+          providing page breaks as necessary.  According to the RFC,
+          any ASCII control chars other than '\b', '\t', '\n', '\012',
+          '\r' should be discarded -- it is your task to do so as you
+          know better how to deal with them (accented letters,...)
+          especially when you know PDF files may be sent using that type!  *)
   | Bin     (** Binary file to be printed as is (including control chars). *)
   | PS      (** PostScript file. *)
   | DVI     (** TeX DVI file. *)
@@ -51,19 +51,19 @@ type file_type =
   | Plot    (** Output from the Berkeley Unix plot library. *)
   | Pr of string * int
       (** [Pr(title, number_of_columns)]: print with a heading, page
-	  numbers, and pagination.  The heading should include the
-	  date and time that printing was started, the [title], and a
-	  page number identifier followed by the page number. *)
+          numbers, and pagination.  The heading should include the
+          date and time that printing was started, the [title], and a
+          page number identifier followed by the page number. *)
   | Fortran (** Print interpreting the first column of each line as
-		FORTRAN carriage control.  *)
+                FORTRAN carriage control.  *)
   | Raster  (** Sun raster format file. *)
 
 type file = {
   name: string;         (** Name of the file on the client machine.
-			    [""] means standard input. *)
+                            [""] means standard input. *)
   size: int;            (** Size in bytes of the file. *)
   nbcopies: int;        (** Number of copies requested. *)
-  storage: string;	(** Local file on the disk holding the data. *)
+  storage: string;      (** Local file on the disk holding the data. *)
   of_type: file_type;   (** Type of the file. *)
 }
 
@@ -90,7 +90,7 @@ type job = {
       keep them longer, rename them or (better) move them to another
       directory. *)
   addr : Unix.sockaddr; (** Address of the machine which connected to
-			    this server. *)
+                            this server. *)
 }
 
 
@@ -124,24 +124,24 @@ module type CONFIG =
 sig
   val queues : (string * queue_actions) list
     (** Give the names of the allowed queues and the actions to be
-	taken for each of them.  Do not forget that it is your
-	responsability to remove the jobs files on the disk (we have
-	no way to know for how long you need them).  None of the queue
-	names can contain a space (i.e. ' ', '\t', '\012' or
-	'\013'). *)
+        taken for each of them.  Do not forget that it is your
+        responsability to remove the jobs files on the disk (we have
+        no way to know for how long you need them).  None of the queue
+        names can contain a space (i.e. ' ', '\t', '\012' or
+        '\013'). *)
   val authorized_host : Unix.sockaddr -> bool
     (** [authorized_host addr] determines whether a connection from
-	[addr] is accepted. *)
+        [addr] is accepted. *)
   val log : string -> unit
     (** How to log connections and protocol.  It is the responsability
-	of this function to add a final ["\n"] and to flush the
-	necessary channel.  [print_endline] is an easy choice.  It is
-	customary to add a timestamp to the messages being logged.
-	{!Lpd.string_of_current_time} can help you with that.  *)
+        of this function to add a final ["\n"] and to flush the
+        necessary channel.  [print_endline] is an easy choice.  It is
+        customary to add a timestamp to the messages being logged.
+        {!Lpd.string_of_current_time} can help you with that.  *)
   val temp_dir : string
     (** Temprary directory to store the jobs sent.  If equal to [""],
-	the value of the environment variable [TMPDIR] (or [TEMP] on
-	win32) will be used. *)
+        the value of the environment variable [TMPDIR] (or [TEMP] on
+        win32) will be used. *)
 end
 
 
@@ -157,33 +157,33 @@ sig
   val socket : ?port:int -> unit -> Unix.file_descr
     (** [socket ?port ()] creates a socket for the LPD daemon.
 
-	@param port allows to specify on which port the socket
-	listens.  By default it is the standard port for LPD i.e. 515.
+        @param port allows to specify on which port the socket
+        listens.  By default it is the standard port for LPD i.e. 515.
     *)
 
   val accept : ?thread:((unit -> unit) -> unit) ->
     Unix.file_descr ->
     (Unix.sockaddr -> Socket.in_channel -> Socket.out_channel -> unit) -> 'a
     (** [accept ?thread socket f] listen on [socket] and, for each
-	authorized connection (see [C.authorized_host]), runs [f
-	addr inchan outchan] where [addr] is the address of the
-	connecting machine and [inchan], [outchan] are buffered
-	communication channels connected to the client.  [accept]
-	never returns normally.
+        authorized connection (see [C.authorized_host]), runs [f
+        addr inchan outchan] where [addr] is the address of the
+        connecting machine and [inchan], [outchan] are buffered
+        communication channels connected to the client.  [accept]
+        never returns normally.
 
-	@param thread tells how to run [f] in a separate thread.  A
-	typical example is to declare it as [fun f ->
-	ignore(Thread.create f ())] but of course one can also arrange
-	the reuse a thread of a pool.  The default is not to create a
-	new thread.  Do {i not} use that function to clone the process
-	with [fork] or file descriptors will leak. *)
+        @param thread tells how to run [f] in a separate thread.  A
+        typical example is to declare it as [fun f ->
+        ignore(Thread.create f ())] but of course one can also arrange
+        the reuse a thread of a pool.  The default is not to create a
+        new thread.  Do {i not} use that function to clone the process
+        with [fork] or file descriptors will leak. *)
 
   val daemon : Unix.sockaddr -> Socket.in_channel -> Socket.out_channel -> unit
     (** [deamon addr inchan outchan] will read LPD queries on [inchan]
-	and send replies on [outchan].  The particular treatement each
-	query receives is determined by [C.queues].  [addr] is the
-	address of the client.  This function is typically used as
-	[accept (socket()) daemon].  *)
+        and send replies on [outchan].  The particular treatement each
+        query receives is determined by [C.queues].  [addr] is the
+        address of the client.  This function is typically used as
+        [accept (socket()) daemon].  *)
 end
 
 

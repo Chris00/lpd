@@ -90,27 +90,27 @@ let rec input_tochan_till sk oc c =
  ***********************************************************************)
 
 type file_type =
-  | Text of int * int	(* f -> Text(I -> indent, W -> width) *)
-  | Bin			(* l *)
-  | PS			(* o *)
-  | DVI			(* d *)
+  | Text of int * int   (* f -> Text(I -> indent, W -> width) *)
+  | Bin                 (* l *)
+  | PS                  (* o *)
+  | DVI                 (* d *)
   | Troff of string * string * string * string (* t -> troff(1, 2, 3, 4) *)
-  | Ditroff		(* n *)
-  | CIF			(* c *)
-  | Plot		(* g *)
-  | Pr of string * int	(* p -> Pr(N|T -> title, W -> width) *)
-  | Fortran		(* r *)
-  | Raster		(* v *)
+  | Ditroff             (* n *)
+  | CIF                 (* c *)
+  | Plot                (* g *)
+  | Pr of string * int  (* p -> Pr(N|T -> title, W -> width) *)
+  | Fortran             (* r *)
+  | Raster              (* v *)
 
 (* For holding the values when parsing the control file *)
 type file_type_params = {
-  indent : int;		(* I *)
-  width : int;		(* W *)
-  r_font : string; 	(* 1 *)
-  i_font : string;	(* 2 *)
-  b_font : string;	(* 3 *)
-  s_font : string;	(* 4 *)
-  pr_title : string;	(* T *)
+  indent : int;         (* I *)
+  width : int;          (* W *)
+  r_font : string;      (* 1 *)
+  i_font : string;      (* 2 *)
+  b_font : string;      (* 3 *)
+  s_font : string;      (* 4 *)
+  pr_title : string;    (* T *)
 }
 
 (* In the control file, the parameters are set BEFORE the printing
@@ -316,7 +316,7 @@ struct
   let () =
     let check q =
       if contains is_space q then failwith(
-	sprintf "Lpd.Make: queues, unlike %S, cannot contain spaces" q) in
+        sprintf "Lpd.Make: queues, unlike %S, cannot contain spaces" q) in
     List.iter (fun (q,_) -> check q) C.queues
 
   (* Generic server function
@@ -334,25 +334,25 @@ struct
       let (s, client) = Unix.accept sock in
       (* Check authorization for connecting. *)
       let client_addr =
-	match client with
-	| Unix.ADDR_UNIX s -> "unix socket " ^ s
-	| Unix.ADDR_INET(addr, port) ->
-	    Unix.string_of_inet_addr addr ^ ":" ^ string_of_int port in
+        match client with
+        | Unix.ADDR_UNIX s -> "unix socket " ^ s
+        | Unix.ADDR_INET(addr, port) ->
+            Unix.string_of_inet_addr addr ^ ":" ^ string_of_int port in
       if C.authorized_host client then begin
         log(sprintf "ALLOW connection from " ^ client_addr);
-	thread(fun () ->
-		 let outc = Socket.out_channel_of_descr s in
-		 try
-		   (* Process the connection *)
-		   server_fun client (Socket.in_channel_of_descr s) outc;
-		   Socket.close_out outc;
-		   (* Unix.close s; *) (* done by close_out *)
-		   log("Closed connection from " ^ client_addr)
-		 with e ->
-		   Socket.close_out outc;
-		   log("Connection from " ^ client_addr
-		       ^ " closed by exception " ^ (Printexc.to_string e))
-	      )
+        thread(fun () ->
+                 let outc = Socket.out_channel_of_descr s in
+                 try
+                   (* Process the connection *)
+                   server_fun client (Socket.in_channel_of_descr s) outc;
+                   Socket.close_out outc;
+                   (* Unix.close s; *) (* done by close_out *)
+                   log("Closed connection from " ^ client_addr)
+                 with e ->
+                   Socket.close_out outc;
+                   log("Connection from " ^ client_addr
+                       ^ " closed by exception " ^ (Printexc.to_string e))
+              )
       end
       else begin
         Unix.close s;
@@ -377,8 +377,8 @@ struct
   let open_temp_file () =
     let rec try_name counter =
       if counter >= 1000 then
-	raise(Invalid(sprintf "Lpd.open_temp_file: %S nonexistent or full"
-			temp_dir));
+        raise(Invalid(sprintf "Lpd.open_temp_file: %S nonexistent or full"
+                        temp_dir));
       let rnd = (Random.State.bits prng) land 0xFFFFFF in
       let name = Filename.concat temp_dir (sprintf "lpd%06x.dat" rnd) in
       try  (name, open_out_gen mode 0o600 name)
@@ -419,29 +419,29 @@ struct
     debug(sprintf "Created temporary file %S" datafile);
     try
       if nbytes > 0 then begin
-	(* nbytes > 0, copy that many bytes to [fh]. *)
-	really_input_tochan inchan fh nbytes;
-	(* Get a single '\000' as acknowledgement of the end of file. *)
-	let ack = Socket.input_char inchan in
-	send_acknowledgment outchan (ack = '\000');
+        (* nbytes > 0, copy that many bytes to [fh]. *)
+        really_input_tochan inchan fh nbytes;
+        (* Get a single '\000' as acknowledgement of the end of file. *)
+        let ack = Socket.input_char inchan in
+        send_acknowledgment outchan (ack = '\000');
       end
       else begin
-	(* nbytes = 0, thus '\000' (?) or [End_of_file] means that the
+        (* nbytes = 0, thus '\000' (?) or [End_of_file] means that the
            file is complete.  FIXME: RFC1179 is vague on this point. *)
-	(try input_tochan_till inchan fh '\000'
-	 with End_of_file -> ());
-	send_acknowledgment outchan true
+        (try input_tochan_till inchan fh '\000'
+         with End_of_file -> ());
+        send_acknowledgment outchan true
       end;
       close_out fh;
       if M.mem dfname !files then (
-	(* Identifier [dfname] already received.  We needed to read the
+        (* Identifier [dfname] already received.  We needed to read the
            file -- so can go on to see what is next -- but we discard it. *)
-	log(sprintf "Datafile %S already received.  Ignoring." dfname);
-	remove_noerror datafile
+        log(sprintf "Datafile %S already received.  Ignoring." dfname);
+        remove_noerror datafile
       )
       else
-	(* Ok, add the file to previously saved ones. *)
-	files := M.add dfname datafile !files
+        (* Ok, add the file to previously saved ones. *)
+        files := M.add dfname datafile !files
     with exn ->
       close_out fh;
       remove_noerror datafile; (* [datafile] content is incorrect anyway. *)
@@ -455,29 +455,29 @@ struct
   let rec receive_job_loop inchan outchan ctrl files =
     match get_command_line inchan with
     | ('\001', []) ->
-	(* Abort job. *)
-	ctrl := []; (* all control files removed *)
-	send_acknowledgment outchan true
+        (* Abort job. *)
+        ctrl := []; (* all control files removed *)
+        send_acknowledgment outchan true
 
     | ('\002', [count; name]) ->
-	(* Receive control file (cfA000hostname). *)
-	let nbytes = check_pos_num_and_ack outchan count in
-	log (sprintf " Receiving control file %S (%i bytes)." name nbytes);
-	receive_control inchan outchan ctrl name nbytes;
-	receive_job_loop inchan outchan ctrl files
+        (* Receive control file (cfA000hostname). *)
+        let nbytes = check_pos_num_and_ack outchan count in
+        log (sprintf " Receiving control file %S (%i bytes)." name nbytes);
+        receive_control inchan outchan ctrl name nbytes;
+        receive_job_loop inchan outchan ctrl files
 
     | ('\003', [count; name]) ->
-	(* Receive data file (dfA000hostname). *)
-	let nbytes = check_pos_num_and_ack outchan count in
-	log (sprintf " Receiving data file %S (%i bytes)." name nbytes);
-	(* Do not save the data to [name] for security reasons. *)
-	receive_data inchan outchan files name nbytes;
-	receive_job_loop inchan outchan ctrl files
+        (* Receive data file (dfA000hostname). *)
+        let nbytes = check_pos_num_and_ack outchan count in
+        log (sprintf " Receiving data file %S (%i bytes)." name nbytes);
+        (* Do not save the data to [name] for security reasons. *)
+        receive_data inchan outchan files name nbytes;
+        receive_job_loop inchan outchan ctrl files
 
     | (c, args) ->
-	let args = String.concat ", " args in
-	log (sprintf " INCORRECT receive job subcommand %C [%S]." c args);
-	receive_job_loop inchan outchan ctrl files (* try again *)
+        let args = String.concat ", " args in
+        log (sprintf " INCORRECT receive job subcommand %C [%S]." c args);
+        receive_job_loop inchan outchan ctrl files (* try again *)
 
 
 
@@ -505,16 +505,16 @@ struct
     let add_file dfname file job =
       if dfname = "" then job (* for the 1st dummy file *)
       else
-	try
+        try
           let storage_file = M.find dfname !files in
-	  let file = {file with
-			size = (Unix.stat storage_file).Unix.st_size;
-			storage = storage_file } in
-	  {job with files = file :: job.files}
-	with Not_found ->
+          let file = {file with
+                        size = (Unix.stat storage_file).Unix.st_size;
+                        storage = storage_file } in
+          {job with files = file :: job.files}
+        with Not_found ->
           log(sprintf "Datafile %S requested by control file but not sent!"
-		dfname);
-	  job
+                dfname);
+          job
     in
     (* [parse_ctrl cur_dfname cur_file job ctrl_lines] update the
        [job.files] and other [job] characteristics according to the
@@ -523,112 +523,112 @@ struct
        commands.  *)
     let rec parse_ctrl cur_dfname cur_file ftype job = function
       | [] ->
-	  (* no more lines to process *)
-	  let job = add_file cur_dfname cur_file job in
-	  { job with files = List.rev job.files }
+          (* no more lines to process *)
+          let job = add_file cur_dfname cur_file job in
+          { job with files = List.rev job.files }
 
       | line :: tl when String.length line > 0 ->
-	  let arg = String.sub line 1 (String.length line - 1) in
+          let arg = String.sub line 1 (String.length line - 1) in
           begin match String.unsafe_get line 0 with
-	  | 'C' ->
-	      let job = update_banner_class job arg in
-	      parse_ctrl cur_dfname cur_file ftype job tl
-	  | 'H' -> (* compulsory *)
-	      parse_ctrl cur_dfname cur_file ftype {job with host = arg} tl
-	  | 'I' ->
-	      let ftype =
-		try {ftype with indent = int_of_string arg}
-		with Failure _ -> ftype in
-	      parse_ctrl cur_dfname cur_file ftype job tl
-	  | 'J' ->
-	      let job = update_banner_job job arg in
-	      parse_ctrl cur_dfname cur_file ftype job tl
-	  | 'L' ->
-	      let job = update_banner_user job arg in
-	      parse_ctrl cur_dfname cur_file ftype job tl
-	  | 'M' ->
-	      parse_ctrl cur_dfname cur_file ftype {job with mailto = arg} tl
-	  | 'N' -> (* source name of the file *)
-	      (* The filename may contain spaces at the beginning or
-		 at the end.  However, it may happen that "stdin" is
-		 represented by a white space -- while we prefer "".  *)
-	      let fname = if contains_only is_space arg then "" else arg in
-	      parse_ctrl cur_dfname {cur_file with name=fname} ftype job tl
-	  | 'P' -> (* compulsory *)
-	      parse_ctrl cur_dfname cur_file ftype {job with user = arg} tl
-	  | 'S' -> (* ignore *)
-	      parse_ctrl cur_dfname cur_file ftype job tl
-	  | 'T' ->
-	      parse_ctrl cur_dfname cur_file {ftype with pr_title=arg} job tl
-	  | 'U' ->
-	      (* ignore -- it is the user of this lib responsability *)
-	      parse_ctrl cur_dfname cur_file ftype job tl
-	  | 'W' ->
-	      let ftype =
-		try
-		  let width = int_of_string arg in
-		  if width >= 0 then {ftype with width=width} else ftype
-		with Failure _ -> ftype in
-	      parse_ctrl cur_dfname cur_file ftype job tl
-	  | '1' ->
-	      parse_ctrl cur_dfname cur_file {ftype with r_font=arg} job tl
-	  | '2' ->
-	      parse_ctrl cur_dfname cur_file {ftype with i_font=arg} job tl
-	  | '3' ->
-	      parse_ctrl cur_dfname cur_file {ftype with b_font=arg} job tl
-	  | '4' ->
-	      parse_ctrl cur_dfname cur_file {ftype with s_font=arg} job tl
+          | 'C' ->
+              let job = update_banner_class job arg in
+              parse_ctrl cur_dfname cur_file ftype job tl
+          | 'H' -> (* compulsory *)
+              parse_ctrl cur_dfname cur_file ftype {job with host = arg} tl
+          | 'I' ->
+              let ftype =
+                try {ftype with indent = int_of_string arg}
+                with Failure _ -> ftype in
+              parse_ctrl cur_dfname cur_file ftype job tl
+          | 'J' ->
+              let job = update_banner_job job arg in
+              parse_ctrl cur_dfname cur_file ftype job tl
+          | 'L' ->
+              let job = update_banner_user job arg in
+              parse_ctrl cur_dfname cur_file ftype job tl
+          | 'M' ->
+              parse_ctrl cur_dfname cur_file ftype {job with mailto = arg} tl
+          | 'N' -> (* source name of the file *)
+              (* The filename may contain spaces at the beginning or
+                 at the end.  However, it may happen that "stdin" is
+                 represented by a white space -- while we prefer "".  *)
+              let fname = if contains_only is_space arg then "" else arg in
+              parse_ctrl cur_dfname {cur_file with name=fname} ftype job tl
+          | 'P' -> (* compulsory *)
+              parse_ctrl cur_dfname cur_file ftype {job with user = arg} tl
+          | 'S' -> (* ignore *)
+              parse_ctrl cur_dfname cur_file ftype job tl
+          | 'T' ->
+              parse_ctrl cur_dfname cur_file {ftype with pr_title=arg} job tl
+          | 'U' ->
+              (* ignore -- it is the user of this lib responsability *)
+              parse_ctrl cur_dfname cur_file ftype job tl
+          | 'W' ->
+              let ftype =
+                try
+                  let width = int_of_string arg in
+                  if width >= 0 then {ftype with width=width} else ftype
+                with Failure _ -> ftype in
+              parse_ctrl cur_dfname cur_file ftype job tl
+          | '1' ->
+              parse_ctrl cur_dfname cur_file {ftype with r_font=arg} job tl
+          | '2' ->
+              parse_ctrl cur_dfname cur_file {ftype with i_font=arg} job tl
+          | '3' ->
+              parse_ctrl cur_dfname cur_file {ftype with b_font=arg} job tl
+          | '4' ->
+              parse_ctrl cur_dfname cur_file {ftype with s_font=arg} job tl
 
-	  (* -- Printing commands -- *)
-	  | c ->
-	      (* REMARK: we do not filter the control chars for 'f' *)
-	      let new_type, unknown_cmd =
-		try file_type_of_char ftype c, false
-		with Failure _ -> Bin, true in
-	      if unknown_cmd then parse_ctrl cur_dfname cur_file ftype job tl
+          (* -- Printing commands -- *)
+          | c ->
+              (* REMARK: we do not filter the control chars for 'f' *)
+              let new_type, unknown_cmd =
+                try file_type_of_char ftype c, false
+                with Failure _ -> Bin, true in
+              if unknown_cmd then parse_ctrl cur_dfname cur_file ftype job tl
 
-	      (* Each time one receives a printing command one must
-		 decide whether it concerns the current file (in which
-		 case, one more copy is requested) or whether it is a
-		 new file (in which case, the previous one is added to
-		 the job). *)
-	      else if arg = cur_dfname && new_type = cur_file.of_type then
-		let file = {cur_file with
-			      nbcopies = cur_file.nbcopies + 1} in
-		parse_ctrl cur_dfname file ftype job tl
-	      else
-		let file = match cur_file.of_type with
-		  | Pr(t,w) ->
-		      (* If the title of a 'p' file is empty, update
-			 it to the source name of the file -- RFC §7.25. *)
-		      if t = ""
-		      then {cur_file with of_type=Pr(cur_file.name, w)}
-		      else cur_file
-		  | _ -> cur_file (* nothing to update *) in
-		let job = add_file cur_dfname file job in
-		let new_file = {dummy_file with of_type=new_type} in
-		parse_ctrl arg new_file ftype job tl
+              (* Each time one receives a printing command one must
+                 decide whether it concerns the current file (in which
+                 case, one more copy is requested) or whether it is a
+                 new file (in which case, the previous one is added to
+                 the job). *)
+              else if arg = cur_dfname && new_type = cur_file.of_type then
+                let file = {cur_file with
+                              nbcopies = cur_file.nbcopies + 1} in
+                parse_ctrl cur_dfname file ftype job tl
+              else
+                let file = match cur_file.of_type with
+                  | Pr(t,w) ->
+                      (* If the title of a 'p' file is empty, update
+                         it to the source name of the file -- RFC §7.25. *)
+                      if t = ""
+                      then {cur_file with of_type=Pr(cur_file.name, w)}
+                      else cur_file
+                  | _ -> cur_file (* nothing to update *) in
+                let job = add_file cur_dfname file job in
+                let new_file = {dummy_file with of_type=new_type} in
+                parse_ctrl arg new_file ftype job tl
           end
       | _ :: tl ->
-	  parse_ctrl cur_dfname cur_file ftype job tl
+          parse_ctrl cur_dfname cur_file ftype job tl
     in
     (* Create a job for each control file and call [f] on it. *)
     let job_of_ctrl (cfname, ctrl) =
       (* Extract the remote job number if possible *)
       let num =
-	if String.length cfname < 6 then -1
-	else (try int_of_string(String.sub cfname 3 3) with _ -> -1) in
+        if String.length cfname < 6 then -1
+        else (try int_of_string(String.sub cfname 3 3) with _ -> -1) in
       let init_job = {
-	number = num;
-	user = "";  host = "";  mailto = "";  banner = None;  files = [];
-	addr = client_addr;
+        number = num;
+        user = "";  host = "";  mailto = "";  banner = None;  files = [];
+        addr = client_addr;
       } in
       let ctrl_lines = split (fun c -> c = '\n') ctrl in
       let job =
-	parse_ctrl "" dummy_file default_type_params init_job ctrl_lines in
+        parse_ctrl "" dummy_file default_type_params init_job ctrl_lines in
       try f job
       with e ->
-	log("Queue action on_reception raised " ^ (Printexc.to_string e))
+        log("Queue action on_reception raised " ^ (Printexc.to_string e))
     in
     List.iter job_of_ctrl !ctrl_files;
     (* Remove all the files -- the ones to be kept have been moved by
@@ -656,51 +656,51 @@ struct
     try
       match get_command_line inchan with
       | ('\001', [queue]) ->
-	  (* Print any waiting jobs *)
-	  log ("Print any waiting job for " ^ queue);
-	  action_wrapper "print" (action queue).print
+          (* Print any waiting jobs *)
+          log ("Print any waiting job for " ^ queue);
+          action_wrapper "print" (action queue).print
 
       | ('\002', [queue]) ->
-	  (* Receive a printer job *)
-	  log ("Receiving job for queue " ^ queue);
-	  let f, queue_exists =
-	    try (List.assoc queue C.queues).on_reception, true
-	    with Not_found -> (fun _ -> ()), false in
-	  if queue_exists then (
-	    send_acknowledgment outchan true;
-	    receive_job client_addr inchan outchan f;
-	  )
-	  else (
-	    log(queue ^ ": unknown queue");
-	    send_acknowledgment outchan false (* and close connection *)
-	  )
+          (* Receive a printer job *)
+          log ("Receiving job for queue " ^ queue);
+          let f, queue_exists =
+            try (List.assoc queue C.queues).on_reception, true
+            with Not_found -> (fun _ -> ()), false in
+          if queue_exists then (
+            send_acknowledgment outchan true;
+            receive_job client_addr inchan outchan f;
+          )
+          else (
+            log(queue ^ ": unknown queue");
+            send_acknowledgment outchan false (* and close connection *)
+          )
 
       | ('\003', queue :: list) ->
-	  (* Send queue state (short) *)
-	  log ("Send state of the queue " ^ queue);
-	  action_wrapper "send_queue"
-	    (fun () -> (action queue).send_queue (jobref_of_list list) outchan)
+          (* Send queue state (short) *)
+          log ("Send state of the queue " ^ queue);
+          action_wrapper "send_queue"
+            (fun () -> (action queue).send_queue (jobref_of_list list) outchan)
 
       | ('\004', queue :: list) ->
-	  (* Send queue state (long) *)
-	  log ("Send long state of the queue " ^ queue);
-	  action_wrapper "send_queue_long"
-	    (fun () ->
-	       (action queue).send_queue_long (jobref_of_list list) outchan)
+          (* Send queue state (long) *)
+          log ("Send long state of the queue " ^ queue);
+          action_wrapper "send_queue_long"
+            (fun () ->
+               (action queue).send_queue_long (jobref_of_list list) outchan)
 
       | ('\005', queue :: agent :: list) ->
-	  (* Remove jobs *)
-	  log(sprintf "Remove job for queue %S and agent %S" queue agent);
-	  action_wrapper "remove"
-	    (fun () ->
-	       (action queue).remove agent client_addr (jobref_of_list list))
+          (* Remove jobs *)
+          log(sprintf "Remove job for queue %S and agent %S" queue agent);
+          action_wrapper "remove"
+            (fun () ->
+               (action queue).remove agent client_addr (jobref_of_list list))
 
       | _ -> raise (Invalid "Invalid command!")
 
     with End_of_file ->
       (* This may be raised by [get_command_line].  This must be
-	 considered a mistake because one knows how much data to
-	 read so should never read more. *)
+         considered a mistake because one knows how much data to
+         read so should never read more. *)
       log("Premature end of input stream!");
 end
 
@@ -728,9 +728,9 @@ let any_host client =
   | Unix.ADDR_UNIX _ -> false
   | Unix.ADDR_INET (addr, port) ->
       try
-	let _ = (Unix.gethostbyaddr addr).Unix.h_name in
-	(* 721 <= port && port <= 731 *)
-	true
+        let _ = (Unix.gethostbyaddr addr).Unix.h_name in
+        (* 721 <= port && port <= 731 *)
+        true
       with Not_found -> false
 
 let authorized_host_of_file fname l =
@@ -739,10 +739,10 @@ let authorized_host_of_file fname l =
     let hosts = ref l in
     begin try
       while true do
-	let l = input_line fh in
-	let l = (try String.sub l 0 (String.index l '#')
-		 with Not_found -> l) in
-	hosts := List.rev_append (split is_space l) !hosts
+        let l = input_line fh in
+        let l = (try String.sub l 0 (String.index l '#')
+                 with Not_found -> l) in
+        hosts := List.rev_append (split is_space l) !hosts
       done;
     with End_of_file -> ()
     end;
@@ -758,13 +758,13 @@ let these_hosts ?file hosts =
     match client with
     | Unix.ADDR_UNIX _ -> false
     | Unix.ADDR_INET (addr, port) ->
-	try
-	  let client_addr = Unix.string_of_inet_addr addr  in
-	  (* If the IP is listed, we do not need to try to resolve it. *)
-	  List.mem client_addr hosts
-	  || (let client_name = (Unix.gethostbyaddr addr).Unix.h_name in
-	      List.mem client_name hosts)
-	with Not_found -> false
+        try
+          let client_addr = Unix.string_of_inet_addr addr  in
+          (* If the IP is listed, we do not need to try to resolve it. *)
+          List.mem client_addr hosts
+          || (let client_name = (Unix.gethostbyaddr addr).Unix.h_name in
+              List.mem client_name hosts)
+        with Not_found -> false
 
 
 
@@ -790,22 +790,22 @@ let string_of_job rank job =
     | [] -> "(Canceled)"
     | [file] ->
         let l = String.length file.name in
-	sprintf "%-37s %i bytes"
+        sprintf "%-37s %i bytes"
           (if l = 0 then "(standard input)"
            else if l <= 37 then file.name
            else "..." ^ (String.sub file.name (l - 34) 34))
           (file.nbcopies * file.size)
     | _ ->
-	let files =
-	  String.concat ", " (List.map (fun f -> f.name) job.files) in
-	let files =
-	  if String.length files <= 37 then files else
-	    let name f = Filename.basename f.name in
-	    let files = String.concat ", " (List.map name job.files) in
-	    let l = String.length files in
-	    if l <= 37 then files
-	    else "..." ^ (String.sub files (l - 34) 34) in
-	sprintf "%-37s %i bytes"
+        let files =
+          String.concat ", " (List.map (fun f -> f.name) job.files) in
+        let files =
+          if String.length files <= 37 then files else
+            let name f = Filename.basename f.name in
+            let files = String.concat ", " (List.map name job.files) in
+            let l = String.length files in
+            if l <= 37 then files
+            else "..." ^ (String.sub files (l - 34) 34) in
+        sprintf "%-37s %i bytes"
           files
           (List.fold_left (fun a f -> a + f.nbcopies * f.size) 0 job.files)
   in
