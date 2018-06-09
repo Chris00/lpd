@@ -1,27 +1,9 @@
 #							-*-conf-unix-*-
-*.cm[ioax]
-*.cmxa
-*.annot
-*.exe
-*.opt
-*.native
-.depend.ocaml
 rfc1179.html
 rfc1179.html.gz
-Makefile.pub
 doc
 web/LICENSE.txt
-# OASIS generated files:
-API.odocl
-AUTHORS.txt
-INSTALL.txt
-README.txt
-META
-_build
-_tags
-*.mllib
-myocamlbuild.ml
-setup.data
-setup.log
-setup.ml
+_build/
 *.tar.gz
+.merlin
+*.install

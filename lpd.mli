@@ -13,11 +13,11 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the file
    LICENSE.txt for more details.
 *)
-(*      $Id: lpd.mli,v 1.5 2007/02/15 23:38:51 chris_77 Exp $      *)
 
 (** LPD protocol server library (RFC 1179 compliant).
 
     @author Christophe Troestler
+    @version %%VERSION%%
 *)
 
 

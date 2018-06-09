@@ -25,19 +25,7 @@ The easier way to install this library is by using
 
     opam install lpd
 
-If you would like to compile the development version, you will need
-the following packages:
-
-- oasis — to set up the build with `ocamlbuild`;
-- ocamlfind — to install the library;
-- `make` — to provide an easy way to drive the build process.
-
-Then issue:
-
-    make
-    make install
-
-To remove the library, do
-
-    make uninstall
+If you would like to compile the development version, install
+[Dune](https://github.com/ocaml/dune).  A `Makefile` is provided for
+the developers convenience.
 

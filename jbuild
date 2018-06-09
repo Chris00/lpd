@@ -1,0 +1,29 @@
+(jbuild_version 1)
+
+(library
+ ((name        lpd)
+  (public_name lpd)
+  (modules    (lpd))
+  (libraries  (socket))
+  (synopsis "Line Printer Daemon (LPD) server library")))
+
+(library
+ ((name        socket)
+  (public_name lpd.socket)
+  (modules    (socket))
+  (libraries  (unix))
+  (synopsis "Buffered sockets (working even on win98)")))
+
+(executable
+ ((name      lpd_to_win)
+  (modules   (lpd_to_win))
+  (libraries (threads lpd))))
+
+(executable
+ ((name      page_counter)
+  (modules   (page_counter))
+  (libraries (threads lpd))))
+
+(alias
+ ((name examples)
+  (deps (lpd_to_win.exe page_counter.exe))))

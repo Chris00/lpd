@@ -6,7 +6,7 @@
     for the OCaml Library.
 
     @author Christophe Troestler
-    @version 0.8
+    @version %%VERSION%%
 *)
 (* Since (in|out)_channel_of_descr does NOT work under win32, we need
    to implement a minimal buffered interface.
