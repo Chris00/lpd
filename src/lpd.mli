@@ -168,15 +168,16 @@ sig
     Unix.file_descr ->
     (Unix.sockaddr -> Socket.in_channel -> Socket.out_channel -> unit) -> 'a
     (** [accept ?thread socket f] listen on [socket] and, for each
-        authorized connection (see [C.authorized_host]), runs [f
-        addr inchan outchan] where [addr] is the address of the
+        authorized connection (see [C.authorized_host]), runs
+        [f addr inchan outchan] where [addr] is the address of the
         connecting machine and [inchan], [outchan] are buffered
         communication channels connected to the client.  [accept]
         never returns normally.
 
         @param thread tells how to run [f] in a separate thread.  A
-        typical example is to declare it as [fun f ->
-        ignore(Thread.create f ())] but of course one can also arrange
+        typical example is to declare it as
+        [fun f -> ignore(Thread.create f ())] but of course one can
+        also arrange
         the reuse a thread of a pool.  The default is not to create a
         new thread.  Do {i not} use that function to clone the process
         with [fork] or file descriptors will leak. *)
