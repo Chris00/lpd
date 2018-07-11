@@ -1,6 +1,0 @@
-{1 Library lpd}
-The entry point of this library is the module:
-{!module-Lpd}.
-{1 Library lpd.socket}
-The entry point of this library is the module:
-{!module-Socket}.
