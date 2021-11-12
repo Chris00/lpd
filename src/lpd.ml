@@ -4,7 +4,7 @@
 
    This program is distributed under the terms of the GNU Lesser
    General Public License, with the special exception on linking as
-   for the OCaml Library.  See file LICENSE.txt
+   for the OCaml Library.  See file LICENSE.
 *)
 
 
